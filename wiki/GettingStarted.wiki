@@ -1,0 +1,21 @@
+= Getting Started =
+
+How to get and build the LibYuv code.
+
+== Pre-requisite = 
+
+You'll need to have depot tools installed:
+
+https://sites.google.com/a/chromium.org/dev/developers/how-tos/depottools
+
+== Getting the Code =
+
+Create a working directory, enter it, and run:
+
+$ gclient config http://libyuv.googlecode.com/svn/trunk
+
+$ gclient sync --force
+
+
+The sync will generate native build files for your environment using gyp (Linux: make, OS X: XCode, Windows: Visual Studio). This generation can also be forced manually:
+$ gclient runhooks --force
