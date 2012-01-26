@@ -21,6 +21,16 @@ $ gclient runhooks --force
 
 == Building the library = 
 
-make libyuv
+Linux/OSX
 
+$ make libyuv
 
+Windows
+
+devenv -build Debug libyuv.sln
+devenv -build Debug libyuv_test.sln
+debug\libyuv_unittest.exe --gtest_filter=*
+
+devenv -build Release libyuv.sln
+devenv -build Release libyuv_test.sln
+release\libyuv_unittest.exe --gtest_filter=*
