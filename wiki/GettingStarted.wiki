@@ -21,12 +21,24 @@ $ gclient runhooks --force
 
 == Building the library = 
 
-Linux/OSX
+=== Linux/OSX =
 
 $ make libyuv
 
-Windows
+ARM under Linux
 
+$ export GYP_DEFINES="target_arch=arm armv7=1" <br>
+$ export CROSSTOOL=`<path>`/arm-none-linux-gnueabi <br>
+$ export CXX=$CROSSTOOL-g++ <br>
+$ export CC=$CROSSTOOL-gcc <br>
+$ export AR=$CROSSTOOL-ar <br>
+$ export AS=$CROSSTOOL-as <br>
+$ export RANLIB=$CROSSTOOL-ranlib <br>
+$ gclient runhooks <br>
+
+$ make libyuv
+
+=== Windows =
 
 gclient runhooks<br>
 devenv -build Debug libyuv.sln<br>
@@ -35,3 +47,15 @@ devenv -build Release libyuv.sln<br>
 devenv -build Release libyuv_test.sln<br><br>
 
 build\release\libyuv_unittest.exe %`*` --gtest_filter=`*`
+
+== Building and running the unit tests = 
+
+=== Linux/OSX =
+
+$ make BUILDTYPE=Release <br>
+$ ./out/Release/libyuv_unittest <br>
+
+or
+
+$ make <br>
+$ ./out/Debug/libyuv_unittest <br>
