@@ -28,10 +28,10 @@ $ make libyuv
 Windows
 
 
-gclient runhooks
-devenv -build Debug libyuv.sln
-devenv -build Debug libyuv_test.sln
-devenv -build Release libyuv.sln
-devenv -build Release libyuv_test.sln
+gclient runhooks<br>
+devenv -build Debug libyuv.sln<br>
+devenv -build Debug libyuv_test.sln<br>
+devenv -build Release libyuv.sln<br>
+devenv -build Release libyuv_test.sln<br><br>
 
 build\release\libyuv_unittest.exe %* --gtest_filter=*
