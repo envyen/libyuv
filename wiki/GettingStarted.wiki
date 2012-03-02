@@ -12,12 +12,11 @@ https://sites.google.com/a/chromium.org/dev/developers/how-tos/depottools
 
 Create a working directory, enter it, and run:
 
-$ gclient config http://libyuv.googlecode.com/svn/trunk
-
+$ gclient config http://libyuv.googlecode.com/svn/trunk<br>
 $ gclient sync --force
 
 The sync will generate native build files for your environment using gyp (Linux: make, OS X: XCode, Windows: Visual Studio). This generation can also be forced manually:
-$ gclient runhooks --force
+$ gclient runhooks
 
 == Building the library = 
 
@@ -41,21 +40,21 @@ $ make libyuv
 === Windows =
 
 gclient runhooks<br>
-devenv -build Debug libyuv.sln<br>
-devenv -build Debug libyuv_test.sln<br>
-devenv -build Release libyuv.sln<br>
-devenv -build Release libyuv_test.sln<br><br>
-
-build\release\libyuv_unittest.exe %`*` --gtest_filter=`*`
+devenv -build Debug libyuv.sln <br>
+devenv -build Release libyuv.sln <br>
 
 == Building and running the unit tests = 
 
 === Linux/OSX =
 
+$ make <br>
 $ make BUILDTYPE=Release <br>
+$ ./out/Debug/libyuv_unittest <br>
 $ ./out/Release/libyuv_unittest <br>
 
-or
+=== Windows =
 
-$ make <br>
-$ ./out/Debug/libyuv_unittest <br>
+devenv -build Debug libyuv_test.sln <br>
+devenv -build Release libyuv_test.sln <br><br>
+
+build\release\libyuv_unittest.exe %`*` --gtest_filter=`*`
