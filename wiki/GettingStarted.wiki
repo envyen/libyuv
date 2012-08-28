@@ -1,6 +1,6 @@
 = Getting Started =
 
-How to get and build the LibYuv code.
+How to get and build the libyuv code.
 
 == Pre-requisite = 
 
@@ -16,7 +16,8 @@ gclient config http://libyuv.googlecode.com/svn/trunk<br>
 gclient sync
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually:
-$ gclient runhooks V=1 <br>
+
+gclient runhooks V=1 <br>
 
 == Building the Library = 
 
@@ -35,7 +36,16 @@ xcodebuild -project libyuv.xcodeproj -configuration Release <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Debug <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Release <br>
 
-ARM under Linux configuration
+== GYP_DEFINES = 
+
+To build variations of the library, first set GYP_DEFINES environment variable, then regenerate the build files using gclient runhooks.
+
+== 64 bit Windows =
+
+set GYP_DEFINES=target_arch=x64 <br>
+gclient runhooks V=1 <br>
+
+== ARM Linux =
 
 $ export GYP_DEFINES="target_arch=arm armv7=1" <br>
 $ export CROSSTOOL=`<path>`/arm-none-linux-gnueabi <br>
@@ -46,31 +56,26 @@ $ export AS=$CROSSTOOL-as <br>
 $ export RANLIB=$CROSSTOOL-ranlib <br>
 $ gclient runhooks <br>
 
-X64 under Windows configuration
-set GYP_DEFINES=target_arch=x64 <br>
-gclient runhooks V=1 <br>
-
-
 == Building and Running Unittests = 
 
 === Windows =
 
 devenv -build "Debug" libyuv_test.sln <br>
 devenv -build "Release" libyuv_test.sln  <br>
-build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=* <br>
+build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=`*` <br>
 
 === OSX =
 
 xcodebuild -project libyuv_test.xcodeproj -configuration Debug <br>
 xcodebuild -project libyuv_test.xcodeproj -configuration Release <br>
-xcodebuild/Release/libyuv_unittest --gtest_filter=* <br>
+xcodebuild/Release/libyuv_unittest --gtest_filter=`*` <br>
 
 === Linux =
 
 make -j6 V=1 -r libyuv_unittest BUILDTYPE=Debug <br>
 make -j6 V=1 -r libyuv_unittest BUILDTYPE=Release <br>
-out/Release/libyuv_unittest --gtest_filter=* <br>
+out/Release/libyuv_unittest --gtest_filter=`*` <br>
 
-Replace --gtest_filter=* with specific unittest to run.  May include wildcards. <br>
-e.g. <br>
-build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
+Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards. e.g.
+
+out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
