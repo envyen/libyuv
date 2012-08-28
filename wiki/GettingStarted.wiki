@@ -12,19 +12,30 @@ https://sites.google.com/a/chromium.org/dev/developers/how-tos/depottools
 
 Create a working directory, enter it, and run:
 
-$ gclient config http://libyuv.googlecode.com/svn/trunk<br>
-$ gclient sync --force
+gclient config http://libyuv.googlecode.com/svn/trunk<br>
+gclient sync
 
-The sync will generate native build files for your environment using gyp (Linux: make, OS X: XCode, Windows: Visual Studio). This generation can also be forced manually:
-$ gclient runhooks
+The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually:
+$ gclient runhooks V=1 <br>
 
-== Building the library = 
+== Building the Library = 
 
-=== Linux/OSX =
+=== Windows =
 
-$ make libyuv
+devenv -build "Debug" libyuv.sln <br>
+devenv -build "Release" libyuv.sln <br>
 
-ARM under Linux
+=== OSX =
+
+xcodebuild -project libyuv.xcodeproj -configuration Debug <br>
+xcodebuild -project libyuv.xcodeproj -configuration Release <br>
+
+=== Linux =
+
+make -j6 V=1 -r libyuv BUILDTYPE=Debug <br>
+make -j6 V=1 -r libyuv BUILDTYPE=Release <br>
+
+ARM under Linux configuration
 
 $ export GYP_DEFINES="target_arch=arm armv7=1" <br>
 $ export CROSSTOOL=`<path>`/arm-none-linux-gnueabi <br>
@@ -35,26 +46,31 @@ $ export AS=$CROSSTOOL-as <br>
 $ export RANLIB=$CROSSTOOL-ranlib <br>
 $ gclient runhooks <br>
 
-$ make libyuv
+X64 under Windows configuration
+set GYP_DEFINES=target_arch=x64 <br>
+gclient runhooks V=1 <br>
+
+
+== Building and Running Unittests = 
 
 === Windows =
 
-gclient runhooks<br>
-devenv -build Debug libyuv.sln <br>
-devenv -build Release libyuv.sln <br>
+devenv -build "Debug" libyuv_test.sln <br>
+devenv -build "Release" libyuv_test.sln  <br>
+build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=* <br>
 
-== Building and running the unit tests = 
+=== OSX =
 
-=== Linux/OSX =
+xcodebuild -project libyuv_test.xcodeproj -configuration Debug <br>
+xcodebuild -project libyuv_test.xcodeproj -configuration Release <br>
+xcodebuild/Release/libyuv_unittest --gtest_filter=* <br>
 
-$ make <br>
-$ make BUILDTYPE=Release <br>
-$ ./out/Debug/libyuv_unittest <br>
-$ ./out/Release/libyuv_unittest <br>
+=== Linux =
 
-=== Windows =
+make -j6 V=1 -r libyuv_unittest BUILDTYPE=Debug <br>
+make -j6 V=1 -r libyuv_unittest BUILDTYPE=Release <br>
+out/Release/libyuv_unittest --gtest_filter=* <br>
 
-devenv -build Debug libyuv_test.sln <br>
-devenv -build Release libyuv_test.sln <br><br>
-
-build\release\libyuv_unittest.exe %`*` --gtest_filter=`*`
+Replace --gtest_filter=* with specific unittest to run.  May include wildcards. <br>
+e.g. <br>
+build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
