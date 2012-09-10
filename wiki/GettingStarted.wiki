@@ -19,6 +19,12 @@ The sync will generate native build files for your environment using gyp (Window
 
 gclient runhooks V=1 <br>
 
+== Getting Clang for Linux =
+
+Linux doesn't use clang by default, you have to download it manually the first time:
+
+/tools/clang/scripts/update.sh
+
 == Building the Library = 
 
 === Windows =
