@@ -42,16 +42,24 @@ xcodebuild -project libyuv.xcodeproj -configuration Release <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Debug <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Release <br>
 
+=== Windows Shared Library =
+
+Modify libyuv.gyp from 'static_library' to 'shared_library', and add 'LIBYUV_BUILDING_SHARED_LIBRARY' to 'defines'. Then run this.<br>
+gclient runhooks <br>
+After this command follow the building the library instructions above.<br>
+
+If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows
+
 == GYP_DEFINES = 
 
-To build variations of the library, first set GYP_DEFINES environment variable, then regenerate the build files using gclient runhooks.
+To build other variations of the library, first set GYP_DEFINES environment variable, then regenerate the build files using gclient runhooks.
 
-== 64 bit Windows =
+=== 64 bit Windows =
 
 set GYP_DEFINES=target_arch=x64 <br>
 gclient runhooks V=1 <br>
 
-== ARM Linux =
+=== ARM Linux =
 
 $ export GYP_DEFINES="target_arch=arm armv7=1" <br>
 $ export CROSSTOOL=`<path>`/arm-none-linux-gnueabi <br>
@@ -85,3 +93,13 @@ out/Release/libyuv_unittest --gtest_filter=`*` <br>
 Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards. e.g.
 
 out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
+
+== Benchmarking =
+
+The unittests can be used to benchmark.<br>
+
+set LIBYUV_REPEAT=1000<br>
+build\release\libyuv_unittest.exe --gtest_filter=*I420ToARGB*<br>
+
+libyuvTest.I420ToARGB_OptVsC (863 ms)<br>
+Indicates 0.863 ms/frame for 1280 x 720.
