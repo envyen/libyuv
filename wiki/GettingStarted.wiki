@@ -108,7 +108,7 @@ Note: Valgrind is currently only supported on Linux and Mac OS X <=10.6. Windows
   # Compile in Release mode (not necessary, but recommended)
   # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh -t out/Release/libyuv_unittest`
 
-=== Running ThreadSanitizer (tsan) =
+=== Running Thread Sanitizer (tsan) =
 
   # Follow steps 1-5 above, but for the GYP_DEFINES, use *build_for_tool=tsan* instead.
   # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh --tool=tsan -t out/Release/libyuv_unittest`
