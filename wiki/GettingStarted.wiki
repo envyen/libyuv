@@ -94,6 +94,32 @@ Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards
 
 out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
 
+== Memory tools =
+
+Memory errors and race conditions can be found by running tests under special memory tools. [http://valgrind.org/ Valgrind] is an instrumentation framework for building dynamic analysis tools. Various tests and profilers are built upon it to find memory handling errors and memory leaks, for instance. 
+
+=== Running Valgrind memcheck =
+
+Note: Valgrind is currently only supported on Linux and Mac OS X <=10.6. Windows profiling is not yet in place. 
+  # Get Valgrind binaries by following instructions at http://www.chromium.org/developers/how-tos/using-valgrind/building-valgrind under the heading "Using Pre-built Binaries from Chromium SVN". Notice: In the .gclient file, you need to add *third_party/valgrind* instead of *src/third_party/valgrind* since Libyuv's directory structure is different from Chromium.
+  # Run `gclient sync`
+  # Generate Makefiles with the proper configuration by setting GYP_DEFINES before gclient runhooks as described at http://www.chromium.org/developers/how-tos/using-valgrind . This step is optional but Valgrind will allegedly work better with it.
+  # Clean (this is important) your output dir.
+  # Compile in Release mode (not necessary, but recommended)
+  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh -t out/Release/libyuv_unittest`
+
+=== Running ThreadSanitizer (tsan) =
+
+  # Follow steps 1-5 above, but for the GYP_DEFINES, use *build_for_tool=tsan* instead.
+  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh --tool=tsan -t out/Release/libyuv_unittest`
+  # For more info, see http://www.chromium.org/developers/how-tos/using-valgrind/threadsanitizer
+
+=== Running Address Sanitizer (asan) =
+
+  # Follow steps 1-5 above, but for the GYP_DEFINES, use *build_for_tool=asan* instead.
+  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh --tool=asan -t out/Release/libyuv_unittest`
+  # For more information, see http://dev.chromium.org/developers/testing/addresssanitizer. 
+
 == Benchmarking =
 
 The unittests can be used to benchmark.<br>
