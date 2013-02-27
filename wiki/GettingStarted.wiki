@@ -17,8 +17,6 @@ gclient sync
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually:
 
-gclient runhooks V=1 <br>
-
 == Getting Clang for Linux =
 
 Linux doesn't use clang by default, you have to download it manually the first time:
@@ -29,16 +27,19 @@ Linux doesn't use clang by default, you have to download it manually the first t
 
 === Windows =
 
+gclient runhooks <br>
 devenv -build "Debug" libyuv.sln <br>
 devenv -build "Release" libyuv.sln <br>
 
 === OSX =
 
+gclient runhooks <br>
 xcodebuild -project libyuv.xcodeproj -configuration Debug <br>
 xcodebuild -project libyuv.xcodeproj -configuration Release <br>
 
 === Linux =
 
+gclient runhooks <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Debug <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Release <br>
 
@@ -93,6 +94,11 @@ out/Release/libyuv_unittest --gtest_filter=`*` <br>
 Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards. e.g.
 
 out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
+
+=== Ninja =
+set GYP_DEFINES=target_arch=ia32 <br>
+call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp <br>
+ninja -C out\Release <br>
 
 == Memory tools =
 
