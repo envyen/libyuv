@@ -17,13 +17,48 @@ gclient sync
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually:
 
-== Getting Clang for Linux =
+== Building the Library and Unittests = 
 
-Linux doesn't use clang by default, you have to download it manually the first time:
+To build just the library and not the tests, change libyuv_test.gyp to libyuv.gyp
 
-/tools/clang/scripts/update.sh
+=== Windows =
 
-== Building the Library = 
+set GYP_DEFINES=target_arch=ia32 <br>
+call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp <br>
+ninja -j8 -C out\Release <br>
+ninja -j8 -C out\Debug <br>
+
+=== OSX =
+
+# clang 64 bit <br>
+GYP_DEFINES="clang=1 target_arch=x64" build/gyp_chromium -fninja --depth=. libyuv_test.gyp <br>
+ninja -j8 -C out/Debug <br>
+ninja -j8 -C out/Release <br>
+
+=== Linux =
+
+tools/clang/scripts/update.sh <br>
+GYP_DEFINES="clang=1 target_arch=x64" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp <br>
+ninja -j8 -C out/Debug <br>
+ninja -j8 -C out/Release <br>
+
+=== iOS =
+
+add to .gclient last line ];target_os=['ios','mac']; and gclient sync twice <br>
+
+GYP_DEFINES="OS=ios target_arch=armv7 arm_neon=1" GYP_CROSSCOMPILE=1  GYP_GENERATOR_FLAGS="ninja output_dir=out_ios" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp
+ninja -j8 -C out_ios/Debug-iphoneos
+ninja -j8 -C out_ios/Release-iphoneos
+
+=== Windows Shared Library =
+
+Modify libyuv.gyp from 'static_library' to 'shared_library', and add 'LIBYUV_BUILDING_SHARED_LIBRARY' to 'defines'. <br>
+gclient runhooks <br>
+After this command follow the building the library instructions above.<br>
+
+If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows
+
+<br><br>== Building the Library with native builds (deprecated) = 
 
 === Windows =
 
@@ -43,6 +78,13 @@ gclient runhooks <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Debug <br>
 make -j6 V=1 -r libyuv BUILDTYPE=Release <br>
 
+=== iOS =
+
+add to .gclient last line ];target_os=['ios','mac']; and gclient sync twice <br>
+
+GYP_DEFINES="OS=ios target_arch=armv7 armv7=1 arm_neon=1" GYP_CROSSCOMPILE=1 ./build/gyp_chromium  --depth=. libyuv_test.gyp <br>
+xcodebuild -project libyuv.xcodeproj -configuration Release -arch armv7 -sdk iphoneos7.0 <br>
+
 === Windows Shared Library =
 
 Modify libyuv.gyp from 'static_library' to 'shared_library', and add 'LIBYUV_BUILDING_SHARED_LIBRARY' to 'defines'. Then run this.<br>
@@ -51,10 +93,6 @@ After this command follow the building the library instructions above.<br>
 
 If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows
 
-== GYP_DEFINES = 
-
-To build other variations of the library, first set GYP_DEFINES environment variable, then regenerate the build files using gclient runhooks.
-
 === 64 bit Windows =
 
 set GYP_DEFINES=target_arch=x64 <br>
@@ -62,7 +100,7 @@ gclient runhooks V=1 <br>
 
 === ARM Linux =
 
-$ export GYP_DEFINES="target_arch=arm armv7=1" <br>
+$ export GYP_DEFINES="target_arch=arm" <br>
 $ export CROSSTOOL=`<path>`/arm-none-linux-gnueabi <br>
 $ export CXX=$CROSSTOOL-g++ <br>
 $ export CC=$CROSSTOOL-gcc <br>
@@ -71,38 +109,34 @@ $ export AS=$CROSSTOOL-as <br>
 $ export RANLIB=$CROSSTOOL-ranlib <br>
 $ gclient runhooks <br>
 
-== Building and Running Unittests = 
+== Running Unittests = 
 
 === Windows =
 
-devenv -build "Debug" libyuv_test.sln <br>
-devenv -build "Release" libyuv_test.sln  <br>
-build\release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=`*` <br>
+out\Release\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=`*` <br>
 
 === OSX =
 
-xcodebuild -project libyuv_test.xcodeproj -configuration Debug <br>
-xcodebuild -project libyuv_test.xcodeproj -configuration Release <br>
-xcodebuild/Release/libyuv_unittest --gtest_filter=`*` <br>
+out/Release/libyuv_unittest --gtest_filter=`*` <br>
 
 === Linux =
 
-make -j6 V=1 -r libyuv_unittest BUILDTYPE=Debug <br>
-make -j6 V=1 -r libyuv_unittest BUILDTYPE=Release <br>
 out/Release/libyuv_unittest --gtest_filter=`*` <br>
 
-Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards. e.g.
+Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards. e.g.<br>
 
 out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_OptVsC <br>
-
-=== Ninja =
-set GYP_DEFINES=target_arch=ia32 <br>
-call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp <br>
-ninja -C out\Release <br>
 
 == Memory tools =
 
 Memory errors and race conditions can be found by running tests under special memory tools. [http://valgrind.org/ Valgrind] is an instrumentation framework for building dynamic analysis tools. Various tests and profilers are built upon it to find memory handling errors and memory leaks, for instance. 
+
+=== Running Dr Memory memcheck =
+
+set GYP_DEFINES=build_for_tool=drmemory target_arch=ia32
+call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp
+ninja -C out\Debug
+drmemory out\Debug\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=*
 
 === Running Valgrind memcheck =
 
@@ -128,10 +162,12 @@ Note: Valgrind is currently only supported on Linux and Mac OS X <=10.6. Windows
 
 == Benchmarking =
 
-The unittests can be used to benchmark.<br>
+The unittests can be used to benchmark.<br><br>
 
+set LIBYUV_WIDTH=1280<br>
+set LIBYUV_HEIGHT=1280<br>
 set LIBYUV_REPEAT=1000<br>
-build\release\libyuv_unittest.exe --gtest_filter=*I420ToARGB*<br>
+out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt<br><br>
 
-libyuvTest.I420ToARGB_OptVsC (863 ms)<br>
-Indicates 0.863 ms/frame for 1280 x 720.
+libyuvTest.I420ToARGB_Opt (547 ms)<br>
+Indicates 0.547 ms/frame for 1280 x 720.<br>
