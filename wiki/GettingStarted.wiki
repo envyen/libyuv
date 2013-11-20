@@ -17,7 +17,7 @@ gclient config http://libyuv.googlecode.com/svn/trunk
 gclient sync
 </pre>
 
-For iOS add to .gclient file ;target_os=['ios','mac']; and gclient sync twice.  Example .gclient file for ios<br>
+For iOS add ;target_os=['ios']; to your OSX .gclient and run gclient sync --nohooks twice.  Example .gclient file for ios<br>
 <pre>
 solutions = [
   { "name"        : "trunk",
@@ -28,8 +28,11 @@ solutions = [
     },
     "safesync_url": "",
   },
-];target_os=['mac','ios'];
+];target_os=['ios'];
 </pre>
+
+For Android add ;target_os=['android']; to your Linux .gclient and run gclient sync --nohooks<br>
+
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually: gclient runhooks
 
 == Building the Library and Unittests = 
@@ -42,8 +45,8 @@ Note: To build just the library and not the tests, change libyuv_test.gyp to lib
 <pre>
 set GYP_DEFINES=target_arch=ia32 
 call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp 
-ninja -j8 -C out\Release 
-ninja -j8 -C out\Debug 
+ninja -j7 -C out\Release 
+ninja -j7 -C out\Debug 
 </pre>
 
 === OSX =
@@ -51,8 +54,8 @@ ninja -j8 -C out\Debug
 # Clang 64 bit shown.  Remove clang=1 for gcc and change x64 to ia32 for 32 bit <br>
 <pre>
 GYP_DEFINES="clang=1 target_arch=x64" build/gyp_chromium -fninja --depth=. libyuv_test.gyp 
-ninja -j8 -C out/Debug 
-ninja -j8 -C out/Release 
+ninja -j7 -C out/Debug 
+ninja -j7 -C out/Release 
 </pre>
 
 === Linux =
@@ -60,25 +63,33 @@ ninja -j8 -C out/Release
 <pre>
 tools/clang/scripts/update.sh 
 GYP_DEFINES="clang=1 target_arch=x64" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
-ninja -j8 -C out/Debug 
-ninja -j8 -C out/Release 
+ninja -j7 -C out/Debug 
+ninja -j7 -C out/Release 
 </pre>
+
 === iOS =
 
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
-ninja -j8 -C out_ios/Debug-iphoneos 
-ninja -j8 -C out_ios/Release-iphoneos 
+ninja -j7 -C out_ios/Debug-iphoneos 
+ninja -j7 -C out_ios/Release-iphoneos 
 </pre>
-Note requires DEPS "chromium_revision": "202548", or later.<br><br>
+Note requires DEPS "chromium_revision": "232627", or later.<br><br>
+
+=== Android =
+
+<pre>
+build/android/envsetup.sh
+gclient runhooks
+ninja -j7 -C out/Debug 
+ninja -j7 -C out/Release 
+</pre>
 
 === Windows Shared Library =
 
 Modify libyuv.gyp from 'static_library' to 'shared_library', and add 'LIBYUV_BUILDING_SHARED_LIBRARY' to 'defines'. <br>
 gclient runhooks <br>
 After this command follow the building the library instructions above.<br>
-
-
 
 If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows<br>
 
@@ -103,14 +114,15 @@ xcodebuild -project libyuv.xcodeproj -configuration Release
 
 <pre>
 gclient runhooks 
-make -j6 V=1 -r libyuv BUILDTYPE=Debug 
-make -j6 V=1 -r libyuv BUILDTYPE=Release 
+make -j7 V=1 -r libyuv BUILDTYPE=Debug 
+make -j7 V=1 -r libyuv BUILDTYPE=Release 
 </pre>
 
 === iOS =
 
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7 armv7=1 arm_neon=1" GYP_CROSSCOMPILE=1 ./build/gyp_chromium  --depth=. libyuv_test.gyp 
+xcodebuild -project libyuv.xcodeproj -configuration Debug -arch armv7 -sdk iphoneos7.0 
 xcodebuild -project libyuv.xcodeproj -configuration Release -arch armv7 -sdk iphoneos7.0 
 </pre>
 
@@ -168,11 +180,25 @@ Replace --gtest_filter=`*` with specific unittest to run.  May include wildcards
 out/Release/libyuv_unittest --gtest_filter=libyuvTest.I420ToARGB_Opt
 </pre>
 
+== CPU Emulator tools =
+
+=== Intel SDE (Software Development Emulator) =
+
+Pre-requisite:<br>
+Install IntelSDE for Windows.<br>
+http://software.intel.com/en-us/articles/intel-software-development-emulator
+
+<pre>
+c:\intelsde\sde -hsw -- out\release\libyuv_unittest.exe --gtest_filter=*
+</pre>
+
 == Memory tools =
 
-Memory errors and race conditions can be found by running tests under special memory tools. [http://valgrind.org/ Valgrind] is an instrumentation framework for building dynamic analysis tools. Various tests and profilers are built upon it to find memory handling errors and memory leaks, for instance. 
+=== Running Dr Memory memcheck for Windows =
 
-=== Running Dr Memory memcheck =
+Pre-requisite:<br>
+Install Dr Memory for Windows and add it to your path.<br>
+http://www.drmemory.org/docs/page_install_windows.html
 
 <pre>
 set GYP_DEFINES=build_for_tool=drmemory target_arch=ia32 
@@ -181,7 +207,24 @@ ninja -C out\Debug
 drmemory out\Debug\libyuv_unittest.exe --gtest_catch_exceptions=0 --gtest_filter=* 
 </pre>
 
+
 === Running Valgrind memcheck =
+
+Memory errors and race conditions can be found by running tests under special memory tools. [http://valgrind.org/ Valgrind] is an instrumentation framework for building dynamic analysis tools. Various tests and profilers are built upon it to find memory handling errors and memory leaks, for instance. 
+
+<pre>
+solutions = [
+  { "name"        : "trunk",
+    "url"         : "http://libyuv.googlecode.com/svn/trunk",
+    "deps_file"   : "DEPS",
+    "managed"     : True,
+    "custom_deps" : {
+       "third_party/valgrind": "http://src.chromium.org/svn/trunk/deps/third_party/valgrind/binaries",
+    },
+    "safesync_url": "",
+  },
+]
+</pre>
 
 Note: Valgrind is currently only supported on Linux and Mac OS X <=10.6. Windows profiling is not yet in place. 
   # Get Valgrind binaries by following instructions at http://www.chromium.org/developers/how-tos/using-valgrind/building-valgrind under the heading "Using Pre-built Binaries from Chromium SVN". Notice: In the .gclient file, you need to add *third_party/valgrind* instead of *src/third_party/valgrind* since Libyuv's directory structure is different from Chromium.
@@ -209,12 +252,12 @@ The unittests can be used to benchmark.<br><br>
 
 <pre>
 set LIBYUV_WIDTH=1280
-set LIBYUV_HEIGHT=1280
+set LIBYUV_HEIGHT=720
 set LIBYUV_REPEAT=1000
 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
  
 or for linux 
-LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=1280 LIBYUV_REPEAT=1000 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
+LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=720 LIBYUV_REPEAT=1000 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
   
 libyuvTest.I420ToARGB_Opt (547 ms) 
 </pre>
