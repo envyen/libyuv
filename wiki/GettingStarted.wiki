@@ -79,7 +79,7 @@ Note requires DEPS "chromium_revision": "232627", or later.<br><br>
 === Android =
 
 <pre>
-build/android/envsetup.sh
+source build/android/envsetup.sh
 gclient runhooks
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
