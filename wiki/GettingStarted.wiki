@@ -93,6 +93,18 @@ After this command follow the building the library instructions above.<br>
 
 If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows<br>
 
+
+
+== Building the Library with make = 
+
+=== Linux =
+
+<pre>
+make -j7 V=1 -f linux.mk
+make -j7 V=1 -f linux.mk clean
+make -j7 V=1 -f linux.mk CC=clang++
+</pre>
+
 == Building the Library with native builds (deprecated) = 
 
 === Windows =
