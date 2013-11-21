@@ -47,6 +47,11 @@ set GYP_DEFINES=target_arch=ia32
 call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp 
 ninja -j7 -C out\Release 
 ninja -j7 -C out\Debug 
+
+set GYP_DEFINES=target_arch=x64
+call python build\gyp_chromium -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp
+ninja -C out\Debug_x64
+ninja -C out\Release_x64
 </pre>
 
 === OSX =
@@ -56,13 +61,21 @@ ninja -j7 -C out\Debug
 GYP_DEFINES="clang=1 target_arch=x64" build/gyp_chromium -fninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
+
+GYP_DEFINES="clang=1 target_arch=ia32" build/gyp_chromium -fninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug 
+ninja -j7 -C out/Release 
 </pre>
 
 === Linux =
 
 <pre>
-tools/clang/scripts/update.sh 
-GYP_DEFINES="clang=1 target_arch=x64" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
+tools/clang/scripts/update.sh
+GYP_DEFINES="target_arch=x64" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug 
+ninja -j7 -C out/Release 
+
+GYP_DEFINES="target_arch=ia32" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
 </pre>
