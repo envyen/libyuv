@@ -249,27 +249,36 @@ solutions = [
     "safesync_url": "",
   },
 ]
+
+GYP_DEFINES="clang=0 target_arch=x64 build_for_tool=memcheck" python build/gyp_chromium -fninja --depth=. libyuv_test.gyp
+ninja -C out/Debug
+valgrind out/Debug/libyuv_unittest
 </pre>
 
-Note: Valgrind is currently only supported on Linux and Mac OS X <=10.6. Windows profiling is not yet in place. 
-  # Get Valgrind binaries by following instructions at http://www.chromium.org/developers/how-tos/using-valgrind/building-valgrind under the heading "Using Pre-built Binaries from Chromium SVN". Notice: In the .gclient file, you need to add *third_party/valgrind* instead of *src/third_party/valgrind* since Libyuv's directory structure is different from Chromium.
-  # Run `gclient sync`
-  # Generate Makefiles with the proper configuration by setting GYP_DEFINES before gclient runhooks as described at http://www.chromium.org/developers/how-tos/using-valgrind . This step is optional but Valgrind will allegedly work better with it.
-  # Clean (this is important) your output dir.
-  # Compile in Release mode (not necessary, but recommended)
-  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh -t out/Release/libyuv_unittest`
+For more information, see 
+http://www.chromium.org/developers/how-tos/using-valgrind
 
 === Running Thread Sanitizer (tsan) =
 
-  # Follow steps 1-5 above, but for the GYP_DEFINES, use *build_for_tool=tsan* instead.
-  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh --tool=tsan -t out/Release/libyuv_unittest`
-  # For more info, see http://www.chromium.org/developers/how-tos/using-valgrind/threadsanitizer
+<pre>
+GYP_DEFINES="clang=0 target_arch=x64 build_for_tool=tsan" python build/gyp_chromium -fninja --depth=. libyuv_test.gyp
+ninja -C out/Debug
+valgrind out/Debug/libyuv_unittest
+</pre>
+
+For more info, see
+http://www.chromium.org/developers/how-tos/using-valgrind/threadsanitizer
 
 === Running Address Sanitizer (asan) =
 
-  # Follow steps 1-5 above, but for the GYP_DEFINES, use *build_for_tool=asan* instead.
-  # Run the test with (standing in trunk/): `tools/valgrind-libyuv/libyuv_tests.sh --tool=asan -t out/Release/libyuv_unittest`
-  # For more information, see http://dev.chromium.org/developers/testing/addresssanitizer. 
+<pre>
+GYP_DEFINES="clang=0 target_arch=x64 build_for_tool=asan" python build/gyp_chromium -fninja --depth=. libyuv_test.gyp
+ninja -C out/Debug
+valgrind out/Debug/libyuv_unittest
+</pre>
+
+For more info, see
+http://dev.chromium.org/developers/testing/addresssanitizer
 
 == Benchmarking =
 
