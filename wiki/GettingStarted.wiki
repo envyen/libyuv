@@ -118,6 +118,16 @@ make -j7 V=1 -f linux.mk clean
 make -j7 V=1 -f linux.mk CC=clang++
 </pre>
 
+=== Windows 8 Phone =
+
+Pre-requisite:<br>
+Install Visual Studio 2012 and Arm to your environment.<br>
+<pre>
+call "c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_arm\vcvarsx86_arm.bat"
+nmake /f winarm.mk clean
+nmake /f winarm.mk
+</pre>
+
 == Building the Library with native builds (deprecated) = 
 
 === Windows =
@@ -295,4 +305,4 @@ LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=720 LIBYUV_REPEAT=1000 out\Release\libyuv_unitte
   
 libyuvTest.I420ToARGB_Opt (547 ms) 
 </pre>
-Indicates 0.547 ms/frame for 1280 x 720.<br>
+Indicates 0.547 ms/frame for 1280 x 720.
