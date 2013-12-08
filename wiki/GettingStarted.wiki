@@ -1,3 +1,5 @@
+#summary How to build the libyuv library.
+
 = Getting Started =
 
 How to get and build the libyuv code.
