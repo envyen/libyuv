@@ -58,38 +58,76 @@ This method is not technically correct, and will likely change in the future.
 
 The above goes still has the potential to read the last pixel 100% and last pixel + 1 0%, which may cause a memory exception.  So the left pixel goes to a fraction less than the last pixel, but filters in the minimum amount of it, and the maximum of the last pixel.
 
-  dx = FixedDiv((src_width << 16) - 0x00010001, (dst << 16) - 0x00010001);
+  dx = FixedDiv((src_width << 16) - 0x00010001, (dst << 16) - 0x00010000);
 
 *Box* filter for upsampling switches over to Bilinear.
 
-= ARGB Scale snippet: =
+= Scale snippet: =
 {{{
- // Initial source x/y coordinate and step values as 16.16 fixed point.
-  int dx = 0;
-  int dy = 0;
-  int x = 0;
-  int y = 0;
-  if (filtering) {
+#define CENTERSTART(dx, s) (dx < 0) ? -((-dx >> 1) + s) : ((dx >> 1) + s)
+#define FIXEDDIV1(src, dst) FixedDiv((src << 16) - 0x00010001, \
+                                     (dst << 16) - 0x00010000);
+
+// Compute slope values for stepping.
+void ScaleSlope(int src_width, int src_height,
+                int dst_width, int dst_height,
+                FilterMode filtering,
+                int* x, int* y, int* dx, int* dy) {
+  assert(x != NULL);
+  assert(y != NULL);
+  assert(dx != NULL);
+  assert(dy != NULL);
+  assert(src_width != 0);
+  assert(src_height != 0);
+  assert(dst_width > 0);
+  assert(dst_height > 0);
+  if (filtering == kFilterBox) {
+    // Scale step for point sampling duplicates all pixels equally.
+    *dx = FixedDiv(Abs(src_width), dst_width);
+    *dy = FixedDiv(src_height, dst_height);
+    *x = 0;
+    *y = 0;
+  } else if (filtering == kFilterBilinear) {
     // Scale step for bilinear sampling renders last pixel once for upsample.
     if (dst_width <= Abs(src_width)) {
-      dx = FixedDiv(Abs(src_width), dst_width);
-      x = (dx >> 1) - 32768;
+      *dx = FixedDiv(Abs(src_width), dst_width);
+      *x = CENTERSTART(*dx, -32768);
     } else if (dst_width > 1) {
-      dx = FixedDiv(Abs(src_width) - 1, dst_width - 1);
+      *dx = FIXEDDIV1(Abs(src_width), dst_width);
+      *x = 0;
     }
     if (dst_height <= src_height) {
-      dy = FixedDiv(src_height,  dst_height);
-      y = (dy >> 1) - 32768;
+      *dy = FixedDiv(src_height,  dst_height);
+      *y = CENTERSTART(*dy, -32768);  // 32768 = -0.5 to center bilinear.
     } else if (dst_height > 1) {
-      dy = FixedDiv(src_height - 1, dst_height - 1);
+      *dy = FIXEDDIV1(src_height, dst_height);
+      *y = 0;
     }
+  } else if (filtering == kFilterLinear) {
+    // Scale step for bilinear sampling renders last pixel once for upsample.
+    if (dst_width <= Abs(src_width)) {
+      *dx = FixedDiv(Abs(src_width), dst_width);
+      *x = CENTERSTART(*dx, -32768);
+    } else if (dst_width > 1) {
+      *dx = FIXEDDIV1(Abs(src_width), dst_width);
+      *x = 0;
+    }
+    *dy = FixedDiv(src_height, dst_height);
+    *y = *dy >> 1;
   } else {
     // Scale step for point sampling duplicates all pixels equally.
-    dx = FixedDiv(Abs(src_width), dst_width);
-    dy = FixedDiv(src_height, dst_height);
-    x = dx >> 1;
-    y = dy >> 1;
+    *dx = FixedDiv(Abs(src_width), dst_width);
+    *dy = FixedDiv(src_height, dst_height);
+    *x = CENTERSTART(*dx, 0);
+    *y = CENTERSTART(*dy, 0);
   }
+  // Negative src_width means horizontally mirror.
+  if (src_width < 0) {
+    *x += (dst_width - 1) * *dx;
+    *dx = -*dx;
+    src_width = -src_width;
+  }
+}
 }}}
 
 = Future Work =
