@@ -68,16 +68,16 @@ int ConvertToI420(const uint8* sample,
   int tmp_y_stride = y_stride;
   int tmp_u_stride = u_stride;
   int tmp_v_stride = v_stride;
-  uint8* rotate_buffer = NULL;
+  uint8* buf = NULL;
   int abs_dst_height = (dst_height < 0) ? -dst_height : dst_height;
   if (need_buf) {
     int y_size = dst_width * abs_dst_height;
     int uv_size = ((dst_width + 1) / 2) * ((abs_dst_height + 1) / 2);
-    rotate_buffer = new uint8[y_size + uv_size * 2];
-    if (!rotate_buffer) {
+    buf = new uint8[y_size + uv_size * 2];
+    if (!buf) {
       return 1;  // Out of memory runtime error.
     }
-    y = rotate_buffer;
+    y = buf;
     u = y + y_size;
     v = u + uv_size;
     y_stride = dst_width;
@@ -372,7 +372,7 @@ int ConvertToI420(const uint8* sample,
                      tmp_v, tmp_v_stride,
                      dst_width, abs_dst_height, rotation);
     }
-    delete [] rotate_buffer;
+    delete buf;
   }
 
   return r;

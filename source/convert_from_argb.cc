@@ -36,14 +36,16 @@ int ARGBToI444(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_y == width &&
       dst_stride_u == width &&
       dst_stride_v == width) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_y = dst_stride_u = dst_stride_v = 0;
+    return ARGBToI444(src_argb, 0,
+                      dst_y, 0,
+                      dst_u, 0,
+                      dst_v, 0,
+                      width * height, 1);
   }
   void (*ARGBToYRow)(const uint8* src_argb, uint8* dst_y, int pix) =
       ARGBToYRow_C;
@@ -109,14 +111,16 @@ int ARGBToI422(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_y == width &&
       dst_stride_u * 2 == width &&
       dst_stride_v * 2 == width) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_y = dst_stride_u = dst_stride_v = 0;
+    return ARGBToI422(src_argb, 0,
+                      dst_y, 0,
+                      dst_u, 0,
+                      dst_v, 0,
+                      width * height, 1);
   }
   void (*ARGBToUV422Row)(const uint8* src_argb, uint8* dst_u, uint8* dst_v,
                          int pix) = ARGBToUV422Row_C;
@@ -186,14 +190,16 @@ int ARGBToI411(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_y == width &&
       dst_stride_u * 4 == width &&
       dst_stride_v * 4 == width) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_y = dst_stride_u = dst_stride_v = 0;
+    return ARGBToI411(src_argb, 0,
+                      dst_y, 0,
+                      dst_u, 0,
+                      dst_v, 0,
+                      width * height, 1);
   }
   void (*ARGBToUV411Row)(const uint8* src_argb, uint8* dst_u, uint8* dst_v,
                          int pix) = ARGBToUV411Row_C;
@@ -245,7 +251,7 @@ int ARGBToI411(const uint8* src_argb, int src_stride_argb,
   return 0;
 }
 
-LIBYUV_API SAFEBUFFERS
+LIBYUV_API
 int ARGBToNV12(const uint8* src_argb, int src_stride_argb,
                uint8* dst_y, int dst_stride_y,
                uint8* dst_uv, int dst_stride_uv,
@@ -266,7 +272,7 @@ int ARGBToNV12(const uint8* src_argb, int src_stride_argb,
                       uint8* dst_u, uint8* dst_v, int width) = ARGBToUVRow_C;
   void (*ARGBToYRow)(const uint8* src_argb, uint8* dst_y, int pix) =
       ARGBToYRow_C;
-#if defined(HAS_ARGBTOYROW_SSSE3) && defined(HAS_ARGBTOUVROW_SSSE3)
+#if defined(HAS_ARGBTOYROW_SSSE3)
   if (TestCpuFlag(kCpuHasSSSE3) && width >= 16) {
     ARGBToUVRow = ARGBToUVRow_Any_SSSE3;
     ARGBToYRow = ARGBToYRow_Any_SSSE3;
@@ -347,7 +353,7 @@ int ARGBToNV12(const uint8* src_argb, int src_stride_argb,
 }
 
 // Same as NV12 but U and V swapped.
-LIBYUV_API SAFEBUFFERS
+LIBYUV_API
 int ARGBToNV21(const uint8* src_argb, int src_stride_argb,
                uint8* dst_y, int dst_stride_y,
                uint8* dst_uv, int dst_stride_uv,
@@ -368,7 +374,7 @@ int ARGBToNV21(const uint8* src_argb, int src_stride_argb,
                       uint8* dst_u, uint8* dst_v, int width) = ARGBToUVRow_C;
   void (*ARGBToYRow)(const uint8* src_argb, uint8* dst_y, int pix) =
       ARGBToYRow_C;
-#if defined(HAS_ARGBTOYROW_SSSE3) && defined(HAS_ARGBTOUVROW_SSSE3)
+#if defined(HAS_ARGBTOYROW_SSSE3)
   if (TestCpuFlag(kCpuHasSSSE3) && width >= 16) {
     ARGBToUVRow = ARGBToUVRow_Any_SSSE3;
     ARGBToYRow = ARGBToYRow_Any_SSSE3;
@@ -449,7 +455,7 @@ int ARGBToNV21(const uint8* src_argb, int src_stride_argb,
 }
 
 // Convert ARGB to YUY2.
-LIBYUV_API SAFEBUFFERS
+LIBYUV_API
 int ARGBToYUY2(const uint8* src_argb, int src_stride_argb,
                uint8* dst_yuy2, int dst_stride_yuy2,
                int width, int height) {
@@ -464,13 +470,13 @@ int ARGBToYUY2(const uint8* src_argb, int src_stride_argb,
     dst_yuy2 = dst_yuy2 + (height - 1) * dst_stride_yuy2;
     dst_stride_yuy2 = -dst_stride_yuy2;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (width * height <= kMaxStride &&
       src_stride_argb == width * 4 &&
       dst_stride_yuy2 == width * 2) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_yuy2 = 0;
+    return ARGBToYUY2(src_argb, 0,
+                      dst_yuy2, 0,
+                      width * height, 1);
   }
   void (*ARGBToUV422Row)(const uint8* src_argb, uint8* dst_u, uint8* dst_v,
                          int pix) = ARGBToUV422Row_C;
@@ -545,7 +551,7 @@ int ARGBToYUY2(const uint8* src_argb, int src_stride_argb,
 }
 
 // Convert ARGB to UYVY.
-LIBYUV_API SAFEBUFFERS
+LIBYUV_API
 int ARGBToUYVY(const uint8* src_argb, int src_stride_argb,
                uint8* dst_uyvy, int dst_stride_uyvy,
                int width, int height) {
@@ -560,13 +566,13 @@ int ARGBToUYVY(const uint8* src_argb, int src_stride_argb,
     dst_uyvy = dst_uyvy + (height - 1) * dst_stride_uyvy;
     dst_stride_uyvy = -dst_stride_uyvy;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (width * height <= kMaxStride &&
       src_stride_argb == width * 4 &&
       dst_stride_uyvy == width * 2) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_uyvy = 0;
+    return ARGBToUYVY(src_argb, 0,
+                      dst_uyvy, 0,
+                      width * height, 1);
   }
   void (*ARGBToUV422Row)(const uint8* src_argb, uint8* dst_u, uint8* dst_v,
                          int pix) = ARGBToUV422Row_C;
@@ -653,12 +659,12 @@ int ARGBToI400(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_y == width) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_y = 0;
+    return ARGBToI400(src_argb, 0,
+                      dst_y, 0,
+                      width * height, 1);
   }
   void (*ARGBToYRow)(const uint8* src_argb, uint8* dst_y, int pix) =
       ARGBToYRow_C;
@@ -700,7 +706,7 @@ int ARGBToI400(const uint8* src_argb, int src_stride_argb,
 }
 
 // Shuffle table for converting ARGB to RGBA.
-static uvec8 kShuffleMaskARGBToRGBA = {
+static const uvec8 kShuffleMaskARGBToRGBA = {
   3u, 0u, 1u, 2u, 7u, 4u, 5u, 6u, 11u, 8u, 9u, 10u, 15u, 12u, 13u, 14u
 };
 
@@ -728,17 +734,19 @@ int ARGBToRGB24(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_rgb24 == width * 3) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_rgb24 = 0;
+    return ARGBToRGB24(src_argb, 0,
+                       dst_rgb24, 0,
+                       width * height, 1);
   }
   void (*ARGBToRGB24Row)(const uint8* src_argb, uint8* dst_rgb, int pix) =
       ARGBToRGB24Row_C;
 #if defined(HAS_ARGBTORGB24ROW_SSSE3)
-  if (TestCpuFlag(kCpuHasSSSE3) && width >= 16) {
+  if (TestCpuFlag(kCpuHasSSSE3) && width >= 16 &&
+      IS_ALIGNED(src_argb, 16) && IS_ALIGNED(src_stride_argb, 16) &&
+      IS_ALIGNED(dst_rgb24, 16) && IS_ALIGNED(dst_stride_rgb24, 16)) {
     ARGBToRGB24Row = ARGBToRGB24Row_Any_SSSE3;
     if (IS_ALIGNED(width, 16)) {
       ARGBToRGB24Row = ARGBToRGB24Row_SSSE3;
@@ -774,17 +782,19 @@ int ARGBToRAW(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_raw == width * 3) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_raw = 0;
+    return ARGBToRAW(src_argb, 0,
+                     dst_raw, 0,
+                     width * height, 1);
   }
   void (*ARGBToRAWRow)(const uint8* src_argb, uint8* dst_rgb, int pix) =
       ARGBToRAWRow_C;
 #if defined(HAS_ARGBTORAWROW_SSSE3)
-  if (TestCpuFlag(kCpuHasSSSE3) && width >= 16) {
+  if (TestCpuFlag(kCpuHasSSSE3) && width >= 16 &&
+      IS_ALIGNED(src_argb, 16) && IS_ALIGNED(src_stride_argb, 16) &&
+      IS_ALIGNED(dst_raw, 16) && IS_ALIGNED(dst_stride_raw, 16)) {
     ARGBToRAWRow = ARGBToRAWRow_Any_SSSE3;
     if (IS_ALIGNED(width, 16)) {
       ARGBToRAWRow = ARGBToRAWRow_SSSE3;
@@ -820,12 +830,12 @@ int ARGBToRGB565(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_rgb565 == width * 2) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_rgb565 = 0;
+    return ARGBToRGB565(src_argb, 0,
+                        dst_rgb565, 0,
+                        width * height, 1);
   }
   void (*ARGBToRGB565Row)(const uint8* src_argb, uint8* dst_rgb, int pix) =
       ARGBToRGB565Row_C;
@@ -867,12 +877,12 @@ int ARGBToARGB1555(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_argb1555 == width * 2) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_argb1555 = 0;
+    return ARGBToARGB1555(src_argb, 0,
+                          dst_argb1555, 0,
+                          width * height, 1);
   }
   void (*ARGBToARGB1555Row)(const uint8* src_argb, uint8* dst_rgb, int pix) =
       ARGBToARGB1555Row_C;
@@ -914,12 +924,12 @@ int ARGBToARGB4444(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_argb4444 == width * 2) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_argb4444 = 0;
+    return ARGBToARGB4444(src_argb, 0,
+                          dst_argb4444, 0,
+                          width * height, 1);
   }
   void (*ARGBToARGB4444Row)(const uint8* src_argb, uint8* dst_rgb, int pix) =
       ARGBToARGB4444Row_C;
@@ -970,7 +980,7 @@ int ARGBToJ420(const uint8* src_argb, int src_stride_argb,
                       uint8* dst_u, uint8* dst_v, int width) = ARGBToUVJRow_C;
   void (*ARGBToYJRow)(const uint8* src_argb, uint8* dst_yj, int pix) =
       ARGBToYJRow_C;
-#if defined(HAS_ARGBTOYJROW_SSSE3) && defined(HAS_ARGBTOUVJROW_SSSE3)
+#if defined(HAS_ARGBTOYJROW_SSSE3)
   if (TestCpuFlag(kCpuHasSSSE3) && width >= 16) {
     ARGBToUVJRow = ARGBToUVJRow_Any_SSSE3;
     ARGBToYJRow = ARGBToYJRow_Any_SSSE3;
@@ -986,7 +996,7 @@ int ARGBToJ420(const uint8* src_argb, int src_stride_argb,
     }
   }
 #endif
-#if defined(HAS_ARGBTOYJROW_AVX2) && defined(HAS_ARGBTOUVJROW_AVX2)
+#if defined(HAS_ARGBTOYJROW_AVX2)
   if (TestCpuFlag(kCpuHasAVX2) && width >= 32) {
     ARGBToYJRow = ARGBToYJRow_Any_AVX2;
     if (IS_ALIGNED(width, 32)) {
@@ -1038,12 +1048,12 @@ int ARGBToJ400(const uint8* src_argb, int src_stride_argb,
     src_argb = src_argb + (height - 1) * src_stride_argb;
     src_stride_argb = -src_stride_argb;
   }
-  // Coalesce rows.
+  // Coalesce contiguous rows.
   if (src_stride_argb == width * 4 &&
       dst_stride_yj == width) {
-    width *= height;
-    height = 1;
-    src_stride_argb = dst_stride_yj = 0;
+    return ARGBToJ400(src_argb, 0,
+                      dst_yj, 0,
+                      width * height, 1);
   }
   void (*ARGBToYJRow)(const uint8* src_argb, uint8* dst_yj, int pix) =
       ARGBToYJRow_C;

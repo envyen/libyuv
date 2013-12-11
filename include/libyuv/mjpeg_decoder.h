@@ -45,7 +45,7 @@ struct SetJmpErrorMgr;
 // MJPEG frames.
 //
 // See http://tools.ietf.org/html/rfc2435
-class LIBYUV_API MJpegDecoder {
+class MJpegDecoder {
  public:
   typedef void (*CallbackFunction)(void* opaque,
                                    const uint8* const* data,

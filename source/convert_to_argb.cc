@@ -61,15 +61,15 @@ int ConvertToARGB(const uint8* sample, size_t sample_size,
   bool need_buf = (rotation && format != FOURCC_ARGB) || dst_argb == sample;
   uint8* tmp_argb = dst_argb;
   int tmp_argb_stride = argb_stride;
-  uint8* rotate_buffer = NULL;
+  uint8* buf = NULL;
   int abs_dst_height = (dst_height < 0) ? -dst_height : dst_height;
   if (need_buf) {
     int argb_size = dst_width * abs_dst_height * 4;
-    rotate_buffer = new uint8[argb_size];
-    if (!rotate_buffer) {
+    buf = new uint8[argb_size];
+    if (!buf) {
       return 1;  // Out of memory runtime error.
     }
-    dst_argb = rotate_buffer;
+    dst_argb = buf;
     argb_stride = dst_width;
   }
 
@@ -312,7 +312,7 @@ int ConvertToARGB(const uint8* sample, size_t sample_size,
                      tmp_argb, tmp_argb_stride,
                      dst_width, abs_dst_height, rotation);
     }
-    delete [] rotate_buffer;
+    delete buf;
   }
 
   return r;

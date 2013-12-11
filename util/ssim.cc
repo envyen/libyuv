@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#include "../util/ssim.h"  // NOLINT
+#include "./ssim.h"
 
 #include <math.h>
 #include <string.h>
