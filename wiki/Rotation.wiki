@@ -18,9 +18,9 @@ int ConvertToI420(const uint8* src_frame, size_t src_size,
                   uint32 format);
 }}}
 This function crops, converts, and rotates.  You should think of it in that order.
-  * crops the original image, which is src_width x src_height, to crop_width x crop_height.  At this point the image is still not rotated.
-  * converts the cropped region to I420
-  * rotates by 90, 180 or 270 degrees.
+  * Crops the original image, which is src_width x src_height, to crop_width x crop_height.  At this point the image is still not rotated.
+  * Converts the cropped region to I420.  Supports inverted source for src_height negative.
+  * Rotates by 90, 180 or 270 degrees.
 The buffer the caller provides should account for rotation.  Be especially important to get stride of the destination correct.
 
 e.g.
