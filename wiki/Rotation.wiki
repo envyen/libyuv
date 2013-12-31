@@ -29,6 +29,19 @@ Crop to 640 x 360<br>
 Rotate by 90 degrees to 360 x 640.<br>
 Caller passes stride of 360 for Y and 360 / 2 for U and V.<br>
 Caller passes crop_width of 640, crop_height of 360.<br>
+
+= ConvertToARGB =
+{{{
+int ConvertToARGB(const uint8* src_frame, size_t src_size,
+                  uint8* dst_argb, int dst_stride_argb,
+                  int crop_x, int crop_y,
+                  int src_width, int src_height,
+                  int crop_width, int crop_height,
+                  enum RotationMode rotation,
+                  uint32 format);
+}}}
+Same as I420, but implementation is less optimized - reads columns and writes rows, 16 bytes at a time.
+
 = I420Rotate =
 
 {{{
@@ -50,17 +63,14 @@ Cropping can be achieved by adjusting the src_y/u/v pointers and src_width, src_
 
 Lower level plane functions are provided, allowing other planar formats to be rotated.  (e.g. I444)
 
-= ConvertToARGB =
+For other planar YUV formats (I444, I422, I411, I400, NV16, NV24), the planar functions are exposed and can be called directly
+
 {{{
-int ConvertToARGB(const uint8* src_frame, size_t src_size,
-                  uint8* dst_argb, int dst_stride_argb,
-                  int crop_x, int crop_y,
-                  int src_width, int src_height,
-                  int crop_width, int crop_height,
-                  enum RotationMode rotation,
-                  uint32 format);
+// Rotate a plane by 0, 90, 180, or 270.
+int RotatePlane(const uint8* src, int src_stride,
+                uint8* dst, int dst_stride,
+                int src_width, int src_height, enum RotationMode mode);
 }}}
-Same as I420, but implementation is less optimized - reads columns and writes rows.
 
 = ARGBRotate =
 
@@ -73,7 +83,9 @@ int ARGBRotate(const uint8* src_argb, int src_stride_argb,
 
 Same as I420, but implementation is less optimized - reads columns and writes rows.
 
-= Mirror =
+Rotate by 90, or any angle, can be achieved using ARGBAffine.
+
+= Mirror - Horizontal Flip =
 
 Mirror functions for horizontally flipping an image, which can be useful for 'self view' of a webcam.
 {{{
@@ -88,9 +100,11 @@ int ARGBMirror(const uint8* src_argb, int src_stride_argb,
                uint8* dst_argb, int dst_stride_argb,
                int width, int height);
 }}}
-Inverting can be achieved with almost any libyuv function by passing a negative height.
-Mirroring functions for I420 and ARGB can also be used to rotate by 180 by passing a negative height.
 
 Mirror functionality can also be achieved with the I420Scale and ARGBScale functions by passing negative width and/or height.
 
-Rotate by 90, or any angle, can be achieved using ARGBAffine.
+= Invert - Vertical Flip =
+
+Inverting can be achieved with almost any libyuv function by passing a negative height.
+
+I420Mirror and ARGBMirror can also be used to rotate by 180 degrees by passing a negative height.
