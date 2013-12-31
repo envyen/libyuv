@@ -1,4 +1,4 @@
-#summary LibYuv Filter Subsampling.
+#summary Subsampling and Scaling Filtering
 
 = Introduction =
 
