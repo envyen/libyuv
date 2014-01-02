@@ -1,0 +1,36 @@
+#summary Formats (FOURCC)
+
+= Introduction =
+
+Formats supported by libyuv are detailed here.
+
+= Core Formats =
+
+There are 2 core formats supported by libyuv - I420 and ARGB.  All YUV formats can be converted to/from I420.  All RGB formats can be converted to/from ARGB.
+
+Filtering functions such as scaling and planar functions work on I420 and/or ARGB.
+
+= OSX Core Media Pixel Formats =
+
+This is how OSX formats map to libyuv
+
+{{{
+enum {
+  kCMPixelFormat_32ARGB          = 32,      FOURCC_BGRA
+  kCMPixelFormat_32BGRA          = 'BGRA',  FOURCC_ARGB
+  kCMPixelFormat_24RGB           = 24,      FOURCC_RAW
+  kCMPixelFormat_16BE555         = 16,      Not supported.
+  kCMPixelFormat_16BE565         = 'B565',  Not supported.
+  kCMPixelFormat_16LE555         = 'L555',  FOURCC_RGBO
+  kCMPixelFormat_16LE565         = 'L565',  FOURCC_RGBP
+  kCMPixelFormat_16LE5551        = '5551',  Not supported
+  kCMPixelFormat_422YpCbCr8      = '2vuy',  FOURCC_UYVY
+  kCMPixelFormat_422YpCbCr8_yuvs = 'yuvs',  FOURCC_YUY2
+  kCMPixelFormat_444YpCbCr8      = 'v308',  FOURCC_I444 ?
+  kCMPixelFormat_4444YpCbCrA8    = 'v408',  Not supported.
+  kCMPixelFormat_422YpCbCr16     = 'v216',  Not supported.
+  kCMPixelFormat_422YpCbCr10     = 'v210',  FOURCC_V210 previously.  Removed now.
+  kCMPixelFormat_444YpCbCr10     = 'v410',  Not supported.
+  kCMPixelFormat_8IndexedGray_WhiteIsZero = 0x00000028,  Not supported.
+};
+}}}
