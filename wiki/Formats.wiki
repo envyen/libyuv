@@ -107,3 +107,26 @@ enum FourCC {
   // 1 Auxiliary compressed YUV format set aside for capturer.
   FOURCC_H264 = FOURCC('H', '2', '6', '4'),
 }}}
+
+= The ARGB FOURCC =
+
+There are 4 ARGB layouts - ARGB, BGRA, ABGR and RGBA.  ARGB is most common by far, used for screen formats, and windows webcam drivers.<br>
+The fourcc describes the order of channels in a ***register***.<br>
+A fourcc provided by capturer, can be thought of string.  e.g.<br>
+  "ARGB"<br>
+On little endian machines, as an int, this would have 'A' in the lowest byte.  The FOURCC macro reverses the order:
+{{{
+#define FOURCC(a, b, c, d) (((uint32)(a)) | ((uint32)(b) << 8) | ((uint32)(c) << 16) | ((uint32)(d) << 24))
+}}}
+So the "ARGB" string, read as an uint32, is
+{{{
+FOURCC_ARGB = FOURCC('A', 'R', 'G', 'B')
+}}}
+If you were to read ARGB pixels as uint32's, the alpha would be in the high byte, and the blue in the lowest byte.  In memory, these are stored little endian, so 'B' is first, then 'G', 'R' and 'A' last.
+
+When calling conversion functions, the names match the FOURCC, so in this case it would be I420ToARGB().<br>
+All formats can be converted to/from ARGB.<br>
+Most 'planar_functions' work on ARGB (e.g. ARGBBlend).<br>
+Some are channel order agnostic. (e.g. ARGBScale)<br>
+Some functions are symmetric.  (e.g. ARGBToBGRA is the same as BGRAToARGB, so its a macro)<br>
+ARGBBlend expects preattenuated ARGB.  The R,G,B are premultiplied by alpha.  Other functions don't care<br>
