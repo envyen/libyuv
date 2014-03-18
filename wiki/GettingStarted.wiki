@@ -126,6 +126,10 @@ Pre-requisite:<br>
 Install Visual Studio 2012 and Arm to your environment.<br>
 <pre>
 call "c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_arm\vcvarsx86_arm.bat"
+</pre>
+or Visual Studio 2013<br>
+<pre>
+call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_arm\vcvarsx86_arm.bat"
 nmake /f winarm.mk clean
 nmake /f winarm.mk
 </pre>
