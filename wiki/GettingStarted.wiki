@@ -89,8 +89,13 @@ GYP_DEFINES="OS=ios target_arch=armv7" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="o
 ninja -j7 -C out_ios/Debug-iphoneos 
 ninja -j7 -C out_ios/Release-iphoneos 
 </pre>
-Note requires DEPS "chromium_revision": "232627", or later.<br><br>
 
+arm64 iOS
+<pre>
+GYP_DEFINES="OS=ios target_arch=armv7 target_subarch=64" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./build/gyp_chromium -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out_ios/Debug-iphoneos 
+ninja -j7 -C out_ios/Release-iphoneos 
+</pre>
 === Android =
 
 <pre>
