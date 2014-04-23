@@ -86,15 +86,15 @@ ninja -j7 -C out/Release
 
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
-ninja -j7 -C out_ios/Debug-iphoneos 
-ninja -j7 -C out_ios/Release-iphoneos 
+ninja -j7 -C out_ios/Debug-iphoneos libyuv_unittest
+ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 </pre>
 
 arm64 iOS
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7 target_subarch=64" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
-ninja -j7 -C out_ios/Debug-iphoneos 
-ninja -j7 -C out_ios/Release-iphoneos 
+ninja -j7 -C out_ios/Debug-iphoneos libyuv_unittest
+ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 </pre>
 === Android =
 
