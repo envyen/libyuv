@@ -316,14 +316,17 @@ http://dev.chromium.org/developers/testing/addresssanitizer
 
 The unittests can be used to benchmark.<br><br>
 
+=== Windows =
 <pre>
 set LIBYUV_WIDTH=1280
 set LIBYUV_HEIGHT=720
 set LIBYUV_REPEAT=1000
 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
+</pre>
  
-or for linux 
-LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=720 LIBYUV_REPEAT=1000 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
+=== Linux and Mac =
+<pre>
+LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=720 LIBYUV_REPEAT=1000 out/Release/libyuv_unittest --gtest_filter=*I420ToARGB_Opt 
   
 libyuvTest.I420ToARGB_Opt (547 ms) 
 </pre>
