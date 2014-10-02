@@ -146,7 +146,7 @@ ninja -C out/Debug cpuid
 <pre>
 make -j7 V=1 -f linux.mk
 make -j7 V=1 -f linux.mk clean
-make -j7 V=1 -f linux.mk CC=clang++
+make -j7 V=1 -f linux.mk CXX=clang++
 </pre>
 
 === Windows 8 Phone =
