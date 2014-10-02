@@ -10,14 +10,21 @@ You'll need to have depot tools installed:
 
 https://sites.google.com/a/chromium.org/dev/developers/how-tos/depottools
 
+Refer to chromium instructions for each platform for other prerequesites:<br>
+http://www.chromium.org/developers/how-tos/build-instructions-ios<br>
+https://code.google.com/p/chromium/wiki/AndroidBuildInstructions<br>
+
+
 == Getting the Code =
 
 Create a working directory, enter it, and run:
 
+<b>
 <pre>
 gclient config http://libyuv.googlecode.com/svn/trunk 
 gclient sync
 </pre>
+</b>
 
 For iOS add ;target_os=['ios']; to your OSX .gclient and run gclient sync --nohooks twice.  Example .gclient file for ios<br>
 <pre>
@@ -60,11 +67,11 @@ ninja -C out\Release_x64
 
 # Clang 64 bit shown.  Remove clang=1 for gcc and change x64 to ia32 for 32 bit <br>
 <pre>
-GYP_DEFINES="clang=1 target_arch=x64" gyp_libyuv -fninja --depth=. libyuv_test.gyp 
+GYP_DEFINES="clang=1 target_arch=x64" ./gyp_libyuv -fninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
 
-GYP_DEFINES="clang=1 target_arch=ia32" gyp_libyuv -fninja --depth=. libyuv_test.gyp 
+GYP_DEFINES="clang=1 target_arch=ia32" ./gyp_libyuv -fninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
 </pre>
@@ -98,7 +105,13 @@ ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 </pre>
 === Android =
 
+arm64
 <pre>
+GYP_DEFINES="OS=android target_arch=arm64" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug libyuv_unittest
+ninja -j7 -C out/Release libyuv_unittest
+
+Old method:
 source build/android/envsetup.sh
 gclient runhooks
 ninja -j7 -C out/Debug 
@@ -148,6 +161,21 @@ or Visual Studio 2013<br>
 call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_arm\vcvarsx86_arm.bat"
 nmake /f winarm.mk clean
 nmake /f winarm.mk
+</pre>
+
+
+
+== Building the Library with cmake = 
+
+Install cmake:
+http://www.cmake.org/
+<pre>
+mkdir build_with_cmake && cd build_with_cmake && cmake -DCMAKE_INSTALL_PREFIX="/some/path/to/intall/into" -DCMAKE_BUILD_TYPE="Release" .. && cmake --build . --target install --config Release
+
+shorter version:
+cd build
+cmake ..
+cmake --build . 
 </pre>
 
 == Building the Library with native builds (deprecated) = 
