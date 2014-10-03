@@ -11,8 +11,6 @@ You'll need to have depot tools installed:
 https://sites.google.com/a/chromium.org/dev/developers/how-tos/depottools
 
 Refer to chromium instructions for each platform for other prerequesites:<br>
-http://www.chromium.org/developers/how-tos/build-instructions-ios<br>
-https://code.google.com/p/chromium/wiki/AndroidBuildInstructions<br>
 
 
 == Getting the Code =
@@ -26,7 +24,6 @@ gclient sync
 </pre>
 </b>
 
-For iOS add ;target_os=['ios']; to your OSX .gclient and run gclient sync --nohooks twice.  Example .gclient file for ios<br>
 <pre>
 solutions = [
   { "name"        : "trunk",
@@ -37,9 +34,10 @@ solutions = [
     },
     "safesync_url": "",
   },
-];target_os=['ios'];
+];
 </pre>
 
+For iOS add ;target_os=['ios']; to your OSX .gclient and run gclient sync --nohooks twice.<br>
 For Android add ;target_os=['android']; to your Linux .gclient and run gclient sync --nohooks<br>
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually: gclient runhooks
@@ -47,7 +45,6 @@ The sync will generate native build files for your environment using gyp (Window
 == Building the Library and Unittests = 
 
 Note: To build just the library and not the tests, change libyuv_test.gyp to libyuv.gyp
-
 
 === Windows =
 
@@ -90,6 +87,8 @@ ninja -j7 -C out/Release
 </pre>
 
 === iOS =
+http://www.chromium.org/developers/how-tos/build-instructions-ios<br>
+Add to .gclient last line: target_os=['ios'];
 
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
@@ -98,18 +97,26 @@ ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 </pre>
 
 arm64 iOS
+https://code.google.com/p/chromium/wiki/AndroidBuildInstructions<br>
+
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7 target_subarch=64" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out_ios/Debug-iphoneos libyuv_unittest
 ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
+
 </pre>
 === Android =
+Add to .gclient last line: target_os=['android'];
 
 arm64
 <pre>
 GYP_DEFINES="OS=android target_arch=arm64" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug libyuv_unittest
 ninja -j7 -C out/Release libyuv_unittest
+
+disassembly:
+./third_party/android_tools/ndk//toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-objdump -d out/Release/obj/source/libyuv_neon.row_neon64.o
+
 
 Old method:
 source build/android/envsetup.sh
@@ -125,8 +132,6 @@ gclient runhooks <br>
 After this command follow the building the library instructions above.<br>
 
 If you get a compile error for atlthunk.lib on Windows, read http://www.chromium.org/developers/how-tos/build-instructions-windows<br>
-
-
 
 === Build targets =
 
@@ -149,6 +154,26 @@ make -j7 V=1 -f linux.mk clean
 make -j7 V=1 -f linux.mk CXX=clang++
 </pre>
 
+== Building the Library with cmake = 
+
+Install cmake:
+http://www.cmake.org/
+<pre>
+Default debug build:
+mkdir out
+cd out
+cmake ..
+cmake --build . 
+
+Release build/install
+mkdir out
+cd out
+cmake -DCMAKE_INSTALL_PREFIX="/usr/lib" -DCMAKE_BUILD_TYPE="Release" ..
+cmake --build . --config Release
+sudo cmake --build . --target install --config Release
+
+</pre>
+
 === Windows 8 Phone =
 
 Pre-requisite:<br>
@@ -161,21 +186,6 @@ or Visual Studio 2013<br>
 call "c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_arm\vcvarsx86_arm.bat"
 nmake /f winarm.mk clean
 nmake /f winarm.mk
-</pre>
-
-
-
-== Building the Library with cmake = 
-
-Install cmake:
-http://www.cmake.org/
-<pre>
-mkdir build_with_cmake && cd build_with_cmake && cmake -DCMAKE_INSTALL_PREFIX="/some/path/to/intall/into" -DCMAKE_BUILD_TYPE="Release" .. && cmake --build . --target install --config Release
-
-shorter version:
-cd build
-cmake ..
-cmake --build . 
 </pre>
 
 == Building the Library with native builds (deprecated) = 
