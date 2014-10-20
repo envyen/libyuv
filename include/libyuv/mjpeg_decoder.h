@@ -153,6 +153,7 @@ class LIBYUV_API MJpegDecoder {
      int* subsample_x, int* subsample_y, int number_of_components);
 
  private:
+
   void AllocOutputBuffers(int num_outbufs);
   void DestroyOutputBuffers();
 

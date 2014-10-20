@@ -10,29 +10,18 @@
   'includes': [
     'libyuv.gypi',
   ],
-  # Make sure that if we are being compiled to an xcodeproj, nothing tries to
-  # include a .pch.
-  'xcode_settings': {
-    'GCC_PREFIX_HEADER': '',
-    'GCC_PRECOMPILE_PREFIX_HEADER': 'NO',
-  },
   'variables': {
     'use_system_libjpeg%': 0,
     'libyuv_disable_jpeg%': 0,
-    # Link-Time Optimizations.
-    'use_lto%': 0,
     'build_neon': 0,
     'conditions': [
-       ['(target_arch == "armv7" or target_arch == "armv7s" or \
-       (target_arch == "arm" and arm_version >= 7) or target_arch == "arm64")\
-       and (arm_neon == 1 or arm_neon_optional == 1)',
-       {
+       [ '(target_arch == "armv7" or target_arch == "armv7s" or (target_arch == "arm" and arm_version >= 7)) and target_subarch != 64 and (arm_neon == 1 or arm_neon_optional == 1)', {
          'build_neon': 1,
        }],
     ],
   },
   'conditions': [
-    ['build_neon != 0', {
+    [ 'build_neon != 0', {
       'targets': [
         # The NEON-specific components.
         {
@@ -46,20 +35,8 @@
             '-mfpu=vfpv3',
             '-mfpu=vfpv3-d16',
           ],
-          'conditions': [
-            # Disable LTO in libyuv_neon target due to gcc 4.9 compiler bug.
-            ['use_lto == 1', {
-              'cflags!': [
-                '-flto',
-                '-ffat-lto-objects',
-              ],
-            }],
-            # arm64 does not need -mfpu=neon option as neon is not optional
-            ['target_arch != "arm64"', {
-              'cflags': [
-                '-mfpu=neon',
-              ],
-            }],
+          'cflags': [
+            '-mfpu=neon',
           ],
           'include_dirs': [
             'include',
@@ -74,13 +51,9 @@
           'sources': [
             # sources.
             'source/compare_neon.cc',
-            'source/compare_neon64.cc',
             'source/rotate_neon.cc',
-            'source/rotate_neon64.cc',
             'source/row_neon.cc',
-            'source/row_neon64.cc',
             'source/scale_neon.cc',
-            'source/scale_neon64.cc',
           ],
         },
       ],
@@ -94,7 +67,12 @@
       # Allows libyuv.a redistributable library without external dependencies.
       'standalone_static_library': 1,
       'conditions': [
-        ['OS != "ios" and libyuv_disable_jpeg != 1', {
+        [ 'OS == "ios" and target_subarch == 64', {
+          'defines': [
+            'LIBYUV_DISABLE_NEON'
+          ],
+        }],
+        [ 'OS != "ios" and libyuv_disable_jpeg != 1', {
           'defines': [
             'HAVE_JPEG'
           ],
@@ -118,10 +96,13 @@
             }],
           ],
         }],
-        ['build_neon != 0', {
+        [ 'build_neon != 0', {
           'dependencies': [
             'libyuv_neon',
           ],
+          'defines': [
+            'LIBYUV_NEON',
+          ]
         }],
         # MemorySanitizer does not support assembly code yet.
         # http://crbug.com/344505
@@ -130,7 +111,7 @@
             'LIBYUV_DISABLE_X86',
           ],
         }],
-      ], #conditions
+      ],
       'defines': [
         # Enable the following 3 macros to turn off assembly for specified CPU.
         # 'LIBYUV_DISABLE_X86',
@@ -138,7 +119,6 @@
         # 'LIBYUV_DISABLE_MIPS',
         # Enable the following macro to build libyuv as a shared library (dll).
         # 'LIBYUV_USING_SHARED_LIBRARY',
-	# TODO(fbarchard): Make these into gyp defines.
       ],
       'include_dirs': [
         'include',
@@ -149,18 +129,6 @@
           'include',
           '.',
         ],
-        'conditions': [
-          ['OS == "android" and target_arch == "arm64"', {
-            'ldflags': [
-              '-Wl,--dynamic-linker,/system/bin/linker64',
-            ],
-          }],
-          ['OS == "android" and target_arch != "arm64"', {
-            'ldflags': [
-              '-Wl,--dynamic-linker,/system/bin/linker',
-            ],
-          }],
-        ], #conditions
       },
       'sources': [
         '<@(libyuv_sources)',
