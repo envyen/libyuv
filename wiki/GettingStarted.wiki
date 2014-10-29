@@ -54,12 +54,12 @@ Note: To build just the library and not the tests, change libyuv_test.gyp to lib
 
 <pre>
 set GYP_DEFINES=target_arch=ia32 
-call python gyp_libyuv -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp 
+call python gyp_libyuv -fninja -G msvs_version=2013 --depth=. libyuv_test.gyp 
 ninja -j7 -C out\Release 
 ninja -j7 -C out\Debug 
 
 set GYP_DEFINES=target_arch=x64
-call python gyp_libyuv -fninja -G msvs_version=2012 --depth=. libyuv_test.gyp
+call python gyp_libyuv -fninja -G msvs_version=2013 --depth=. libyuv_test.gyp
 ninja -C out\Debug_x64
 ninja -C out\Release_x64
 </pre>
@@ -94,15 +94,14 @@ ninja -j7 -C out/Release
 http://www.chromium.org/developers/how-tos/build-instructions-ios<br>
 Add to .gclient last line: target_os=['ios'];
 
+armv7
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out_ios/Debug-iphoneos libyuv_unittest
 ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 </pre>
 
-arm64 iOS
-https://code.google.com/p/chromium/wiki/AndroidBuildInstructions<br>
-
+arm64
 <pre>
 GYP_DEFINES="OS=ios target_arch=armv7 target_subarch=64" GYP_CROSSCOMPILE=1 GYP_GENERATOR_FLAGS="output_dir=out_ios" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out_ios/Debug-iphoneos libyuv_unittest
@@ -110,7 +109,14 @@ ninja -j7 -C out_ios/Release-iphoneos libyuv_unittest
 
 </pre>
 === Android =
+https://code.google.com/p/chromium/wiki/AndroidBuildInstructions<br>
 Add to .gclient last line: target_os=['android'];
+
+armv7
+<pre>
+GYP_DEFINES="OS=android" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug libyuv_unittest
+ninja -j7 -C out/Release libyuv_unittest
 
 arm64
 <pre>
@@ -118,7 +124,19 @@ GYP_DEFINES="OS=android target_arch=arm64" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ni
 ninja -j7 -C out/Debug libyuv_unittest
 ninja -j7 -C out/Release libyuv_unittest
 
-disassembly:
+ia32
+<pre>
+GYP_DEFINES="OS=android target_arch=ia32" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug libyuv_unittest
+ninja -j7 -C out/Release libyuv_unittest
+
+mipsel
+<pre>
+GYP_DEFINES="OS=android target_arch=mipsel" GYP_CROSSCOMPILE=1 ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
+ninja -j7 -C out/Debug libyuv_unittest
+ninja -j7 -C out/Release libyuv_unittest
+
+arm64 disassembly:
 ./third_party/android_tools/ndk//toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-objdump -d out/Release/obj/source/libyuv_neon.row_neon64.o
 
 
