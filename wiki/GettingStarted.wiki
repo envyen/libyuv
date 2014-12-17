@@ -46,6 +46,14 @@ The sync will generate native build files for your environment using gyp (Window
 A git mirror is available here
 http://git.chromium.org/gitweb/?p=external/libyuv.git;a=summary
 
+=== CentOS =
+
+On CentOS 32 bit the following work around allows a sync:
+<pre>
+export GYP_DEFINES="host_arch=ia32"
+gclient sync
+</pre>
+
 == Building the Library and Unittests = 
 
 Note: To build just the library and not the tests, change libyuv_test.gyp to libyuv.gyp
