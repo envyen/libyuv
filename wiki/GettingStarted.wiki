@@ -42,6 +42,11 @@ For Android add ;target_os=['android']; to your Linux .gclient and run gclient s
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually: gclient runhooks
 
+To get just the source (not buildable):
+<pre>
+svn checkout https://libyuv.googlecode.com/svn/trunk/ libyuv
+</pre>
+
 === Git =
 A git mirror is available here
 http://git.chromium.org/gitweb/?p=external/libyuv.git;a=summary
