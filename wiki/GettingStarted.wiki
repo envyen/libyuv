@@ -51,14 +51,6 @@ svn checkout https://libyuv.googlecode.com/svn/trunk/ libyuv
 A git mirror is available here
 http://git.chromium.org/gitweb/?p=external/libyuv.git;a=summary
 
-=== CentOS =
-
-On CentOS 32 bit the following work around allows a sync:
-<pre>
-export GYP_DEFINES="host_arch=ia32"
-gclient sync
-</pre>
-
 == Building the Library and Unittests = 
 
 Note: To build just the library and not the tests, change libyuv_test.gyp to libyuv.gyp
@@ -75,6 +67,24 @@ set GYP_DEFINES=target_arch=x64
 call python gyp_libyuv -fninja -G msvs_version=2013 --depth=. libyuv_test.gyp
 ninja -C out\Debug_x64
 ninja -C out\Release_x64
+</pre>
+==== Building with clangcl = 
+<pre>
+set GYP_DEFINES=clang=1 target_arch=ia32 libyuv_enable_svn=1 libyuv_disable_jpeg=1
+set LLVM_REPO_URL=svn://svn.chromium.org/llvm-project
+call python tools\clang\scripts\update.py
+call python gyp_libyuv -fninja libyuv_test.gyp
+ninja -C out\Debug
+ninja -C out\Release
+</pre>
+==== Building with GN = 
+
+<pre>
+call gn gen out/Release "--args=is_debug=false target_cpu=\"x86\""
+call gn gen out/Debug "--args=is_debug=true target_cpu=\"x86\""
+ninja -C out/Release
+ninja -C out/Debug
+
 </pre>
 
 === OSX =
@@ -101,6 +111,14 @@ ninja -j7 -C out/Release
 GYP_DEFINES="target_arch=ia32" ./gyp_libyuv -f ninja --depth=. libyuv_test.gyp 
 ninja -j7 -C out/Debug 
 ninja -j7 -C out/Release 
+</pre>
+
+==== CentOS =
+
+On CentOS 32 bit the following work around allows a sync:
+<pre>
+export GYP_DEFINES="host_arch=ia32"
+gclient sync
 </pre>
 
 === iOS =
