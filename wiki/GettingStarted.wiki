@@ -417,7 +417,8 @@ The unittests can be used to benchmark.<br><br>
 <pre>
 set LIBYUV_WIDTH=1280
 set LIBYUV_HEIGHT=720
-set LIBYUV_REPEAT=1000
+set LIBYUV_REPEAT=999
+set LIBYUV_FLAGS=-1
 out\Release\libyuv_unittest.exe --gtest_filter=*I420ToARGB_Opt 
 </pre>
  
@@ -428,3 +429,16 @@ LIBYUV_WIDTH=1280 LIBYUV_HEIGHT=720 LIBYUV_REPEAT=1000 out/Release/libyuv_unitte
 libyuvTest.I420ToARGB_Opt (547 ms) 
 </pre>
 Indicates 0.547 ms/frame for 1280 x 720.
+
+== Making a change =
+<pre>
+gclient sync
+make changed
+gcl change mycl
+gcl upload mycl
+requires auth2 once
+depot-tools-auth login webrtc-codereview.appspot.com
+gcl try mycl
+gcl lint mycl
+gcl commit mycl
+</pre>
