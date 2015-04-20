@@ -33,5 +33,6 @@ you can also repeat the test a specified number of iterations, allowing benchmar
 <pre>
 set LIBYUV_WIDTH=1280
 set LIBYUV_HEIGHT=720
-set LIBYUV_REPEAT=1000
+set LIBYUV_REPEAT=999
+set LIBYUV_FLAGS=-1
 </pre>
