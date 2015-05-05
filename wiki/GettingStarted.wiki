@@ -70,7 +70,7 @@ ninja -C out\Release_x64
 </pre>
 ==== Building with clangcl = 
 <pre>
-set GYP_DEFINES=clang=1 target_arch=ia32 libyuv_enable_svn=1 libyuv_disable_jpeg=1
+set GYP_DEFINES=clang=1 target_arch=ia32 libyuv_enable_svn=1
 set LLVM_REPO_URL=svn://svn.chromium.org/llvm-project
 call python tools\clang\scripts\update.py
 call python gyp_libyuv -fninja libyuv_test.gyp
