@@ -39,6 +39,7 @@ solutions = [
 
 For iOS add ;target_os=['ios']; to your OSX .gclient and run gclient sync --nohooks twice.<br>
 For Android add ;target_os=['android']; to your Linux .gclient and run gclient sync --nohooks<br>
+For Windows the gclient sync must be done from an Administer command prompt.<br>
 
 The sync will generate native build files for your environment using gyp (Windows: Visual Studio, OSX: XCode, Linux: make). This generation can also be forced manually: gclient runhooks
 
